@@ -3,10 +3,11 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import myTodoStore from './store/todos';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <App store={myTodoStore} />
   </React.StrictMode>,
   document.getElementById('root')
 );
