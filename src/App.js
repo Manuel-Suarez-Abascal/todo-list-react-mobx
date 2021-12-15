@@ -3,10 +3,9 @@ import { observer } from "mobx-react-lite"
 import { useState } from 'react';
 import myTodoStore from './store/todos';
 
-const App = observer(({ store }) =>  {
+const App = observer(() =>  {
   const [todo, setTodo] = useState('');
-
-  const handleChange = e => setTodo(e.target.value);
+  const [editTodo, setEditTodo] = useState('');
 
   const addTodo = e => {
     e.preventDefault();
@@ -16,24 +15,52 @@ const App = observer(({ store }) =>  {
     e.target.reset();
   };
 
-  const toggleTodo = id => {
-    myTodoStore.toggleTodo(id);
-  };
+  const editTodos = (e, id) => {
+    e.preventDefault();
+    
+    myTodoStore.editTodos(id, editTodo);
+    myTodoStore.toggleEdit(id);
+    e.target.reset();
+  }
+
+  const handleSetTodo = e => setTodo(e.target.value);
+  const handleEditTodo = e => setEditTodo(e.target.value);
 
   return (
     <div className="App">
       <h1>Todo List</h1>
       <form onSubmit={addTodo}>
-        <input type="text" onChange={handleChange} placeholder='Enter a task...' required/>
+        <input type="text" onChange={handleSetTodo} placeholder='Enter a task...' required/>
       </form>
+
       <ul>
         {
-          myTodoStore.filterTodos.map(todo => {
+          myTodoStore.todos.map(todo => {
             return (
               <>
-                <li className={`${todo.completed ? 'is-completed' : ''}`} key={todo.id} onClick={() => toggleTodo(todo.id)}>
+                <li
+                  className={`${todo.completed ? 'is-completed' : ''}`}
+                  key={todo.id} 
+                  onClick={() => myTodoStore.toggleTodo(todo.id)}
+                >
                   {todo.text}
                 </li>
+
+                <form
+                  onSubmit={(e) => editTodos(e, todo.id)}
+                  className={todo.isEditable ? 'is-editable' : 'is-not-editable'}
+                >
+                  <input
+                    onChange={handleEditTodo}
+                    type="text" 
+                    placeholder='Edit task...' 
+                    required
+                  />
+                </form>
+                
+
+                <button 
+                  onClick={() => myTodoStore.toggleEdit(todo.id)}>Edit</button>
                 <button onClick={() => myTodoStore.removeTodo(todo.id)}>X</button>
               </>
             )
