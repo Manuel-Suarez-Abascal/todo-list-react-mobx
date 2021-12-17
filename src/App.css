@@ -29,7 +29,7 @@
 }
 
 .is-completed {
-  text-decoration: line-through;
+  text-decoration: line-through !important;
 }
 
 .is-editable {

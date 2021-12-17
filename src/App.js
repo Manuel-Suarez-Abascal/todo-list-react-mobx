@@ -2,6 +2,7 @@ import './App.css';
 import { observer } from "mobx-react-lite"
 import { useState } from 'react';
 import myTodoStore from './store/todos';
+import { Button, Alert, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Checkbox } from '@mui/material';
 
 const App = observer(() =>  {
   const [todo, setTodo] = useState('');
@@ -27,51 +28,82 @@ const App = observer(() =>  {
   const handleEditTodo = e => setEditTodo(e.target.value);
 
   return (
-    <div className="App">
-      <h1>Todo List</h1>
+    <div
+      className="App"
+      sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', mx: 'auto'}}
+    >
+      <h1 variant="h1">Todo List</h1>
       <form onSubmit={addTodo}>
         <input type="text" onChange={handleSetTodo} placeholder='Enter a task...' required/>
       </form>
 
-      <ul>
+      <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', mx: 'auto'}} >
         {
-          myTodoStore.todos.map(todo => {
+          myTodoStore.todos.map((todo) => {
             return (
               <>
-                <li
+                <ListItem
                   className={`${todo.completed ? 'is-completed' : ''}`}
-                  key={todo.id} 
-                  onClick={() => myTodoStore.toggleTodo(todo.id)}
+                  key={todo.id}
+                  disablePadding
                 >
-                  {todo.text}
-                </li>
-
+                  <ListItemButton role={undefined} dense>
+                    <ListItemIcon>
+                      <Checkbox
+                        onClick={() => myTodoStore.toggleTodo(todo.id)} 
+                        edge="start"
+                        checked={todo.completed}
+                        tabIndex={-1}
+                        disableRipple
+                        inputProps={{ 'aria-labelledby': todo.id }} />
+                    </ListItemIcon>
+                    <ListItemText id={todo.id} primary={todo.text} />
+                  </ListItemButton>
+                </ListItem>
                 <form
                   onSubmit={(e) => editTodos(e, todo.id)}
                   className={todo.isEditable ? 'is-editable' : 'is-not-editable'}
                 >
                   <input
+                    placeholder="Edit task..."
+                    id="standard-basic" label="Standard"
+                    variant="standard"
                     onChange={handleEditTodo}
-                    type="text" 
-                    placeholder='Edit task...' 
-                    required
+                    type="text"
+                    required 
                   />
                 </form>
-                
+                  <Button
+                    variant='contained'
+                    color='info'
+                    sx={{ m: 1 }}
+                    onClick={() => myTodoStore.toggleEdit(todo.id)}
+                  >
+                    Edit
+                  </Button>
 
-                <button 
-                  onClick={() => myTodoStore.toggleEdit(todo.id)}>Edit</button>
-                <button onClick={() => myTodoStore.removeTodo(todo.id)}>X</button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    sx={{ m: 1 }}
+                    onClick={() => myTodoStore.removeTodo(todo.id)}
+                  >
+                    Delete
+                  </Button>
               </>
-            )
-          })
+            );
+           }
+          )
         }
-      </ul>
-      <p>
+      </List>
+  
+      <>
         {
-          myTodoStore.todosCount >= 1 ? `You have ${myTodoStore.todosCount} task left!` : 'No pending tasks!'
+          myTodoStore.todosCount >= 1
+            ? <Alert sx={{maxWidth: 360, mx: 'auto' }} severity="warning" color="warning">You have { myTodoStore.todosCount } task left!</Alert> 
+            : <Alert sx={{maxWidth: 360, mx: 'auto' }} severity="success" color="success">No pending tasks!</Alert>
         }
-        </p>
+      </>
     </div>
   );
 })
